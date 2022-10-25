@@ -14,6 +14,12 @@ class SchoolListCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
     }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        schoolNameLbl.text?.removeAll()
+        dbnCodeLbl.text?.removeAll()
+    }
 
     func setupCell(withSchoolAndExamData  data : School) {
         schoolNameLbl.text = data.school_name

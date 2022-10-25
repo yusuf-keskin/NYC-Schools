@@ -13,11 +13,9 @@ protocol SessionProtocol {
 class ExamDataService {
     static let instance = ExamDataService()
     
-    var session : SessionProtocol = URLSession.shared
+    var session : SessionProtocol = URLSession.shared as SessionProtocol 
     
     func getSchoolExamScore(withUrl url : URL, completion :@escaping(_ schoolList : [School])->()) {
-        
-        
         
         session.dataTask(with: url) { data, response, error in
             if error != nil {
@@ -29,6 +27,7 @@ class ExamDataService {
                 do {
                    let SchoolExamList =  try decoder.decode([School].self, from: data)
                     completion(SchoolExamList)
+                    
                 } catch  {
                     print(error, "Couldn't be parsed correctly")
                 }
@@ -36,7 +35,7 @@ class ExamDataService {
         }.resume()
     }
 }
-
+    
 extension URLSession : SessionProtocol {}
 
 
