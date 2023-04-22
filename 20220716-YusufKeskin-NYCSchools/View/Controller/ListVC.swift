@@ -62,10 +62,10 @@ class ListVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         detailsVC.dbn =  selectedCell?.dbnCodeLbl.text
 
         DispatchQueue.main.async {
-            detailsVC.mathScoreLbl.text = self.selectedSchool?.sat_math_avg_score
-            detailsVC.readingScoreLbl.text = self.selectedSchool?.sat_critical_reading_avg_score
-            detailsVC.writingScoreLbl.text = self.selectedSchool?.sat_writing_avg_score
-            detailsVC.examTakersNumLbl.text = self.selectedSchool?.num_of_sat_test_takers
+            detailsVC.mathScoreLbl.text = self.selectedSchool?.sat_math_avg_score ?? ""
+            detailsVC.readingScoreLbl.text = self.selectedSchool?.sat_critical_reading_avg_score ?? ""
+            detailsVC.writingScoreLbl.text = self.selectedSchool?.sat_writing_avg_score ?? ""
+            detailsVC.examTakersNumLbl.text = self.selectedSchool?.num_of_sat_test_takers ?? ""
         }
         
         detailsVC.modalPresentationStyle = .fullScreen
