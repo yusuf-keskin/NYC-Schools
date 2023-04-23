@@ -9,36 +9,49 @@ import UIKit
 
 class ListVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    var schoolViewModel =  SchoolViewModel()
+    var schoolViewModel : SchoolViewModelInterface?
     var selectedSchool : School?
     var paginatedSchoolsList = [School]()
     var allSchoolsList = [School]()
     var limit = 40
-
+    
+    init(schoolViewModel: SchoolViewModelInterface) {
+        self.schoolViewModel = schoolViewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
     @IBOutlet weak var tableview: UITableView!
     
     override func viewWillAppear(_ animated: Bool) {
-        schoolViewModel.getExamData { [self] schools in
-//            self.schoolsList = schools ?? [School]()
-            self.allSchoolsList = schools ?? [School]()
-            
-            var index = 0
-            while index < limit {
-                paginatedSchoolsList.append((schools?[index])!)
-                index = index + 1            }
-            
-            
-            DispatchQueue.main.async {
-                self.tableview.reloadData()
-        }
-    }
+
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableview.delegate = self
         tableview.dataSource = self
-        tableview.tableFooterView = UIView(frame: .zero) //------------------
+        tableview.tableFooterView = UIView(frame: .zero)
+        
+        getSchoolList()
+    }
+    
+    func getSchoolList() {
+        schoolViewModel?.getExamData { [weak self] schools in
+            guard !schools.isEmpty else { return }
+            if schools.count >= 40 {
+                self?.paginatedSchoolsList = Array(schools[0...40])
+            } else {
+                self?.paginatedSchoolsList = schools
+            }
+
+            DispatchQueue.main.async {
+                self?.tableview.reloadData()
+            }
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -50,6 +63,11 @@ class ListVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         let school = paginatedSchoolsList[indexPath.row]
         self.selectedSchool = school
         cell.setupCell(withSchoolAndExamData: school)
+        
+        let backgroundView = UIView()
+        backgroundView.backgroundColor = #colorLiteral(red: 0.1982406178, green: 0.2780974939, blue: 0.4466399376, alpha: 1)
+        cell.selectedBackgroundView = backgroundView
+
         return cell
     }
     
@@ -59,8 +77,15 @@ class ListVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         
         let board = UIStoryboard(name: "Main", bundle: nil)
         let detailsVC = board.instantiateViewController(withIdentifier: "DetailsVC") as! DetailsVC
-        detailsVC.dbn =  selectedCell?.dbnCodeLbl.text
-
+        
+        let schoolDetailService = SchoolDetailsService()
+        let schoolDetailsViewModel = DetailsViewModel(schoolDetailService: schoolDetailService)
+        
+        guard let dbn = selectedCell!.dbnCodeLbl.text else { return }
+        
+        schoolDetailsViewModel.dbnCode = dbn
+        detailsVC.detailsModel = schoolDetailsViewModel
+        
         DispatchQueue.main.async {
             detailsVC.mathScoreLbl.text = self.selectedSchool?.sat_math_avg_score ?? ""
             detailsVC.readingScoreLbl.text = self.selectedSchool?.sat_critical_reading_avg_score ?? ""
@@ -91,7 +116,7 @@ class ListVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
             
         }
     }
-
+    
     @objc func reloadTable() {
         tableview.reloadData()
     }

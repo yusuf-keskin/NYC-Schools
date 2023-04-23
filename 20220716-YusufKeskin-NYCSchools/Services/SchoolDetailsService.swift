@@ -7,10 +7,11 @@
 
 import Foundation
 
-class SchoolDetailsService {
-    
-    
-    static let instance = SchoolDetailsService()
+protocol SchoolDetailsServiceInterface {
+    func getSchoolExamScore(withUrl url : URL, completion :@escaping(_ detailsList : [SchoolDetail])->())
+}
+
+class SchoolDetailsService : SchoolDetailsServiceInterface {
     
     var session : SessionProtocol = URLSession.shared
     

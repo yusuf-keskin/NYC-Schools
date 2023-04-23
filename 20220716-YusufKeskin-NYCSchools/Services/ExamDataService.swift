@@ -6,16 +6,21 @@
 //
 
 import Foundation
+
 protocol SessionProtocol {
-    func dataTask(with url : URL, completionHandler : @escaping (Data?, URLResponse?, Error?)->()) -> URLSessionDataTask
+    func dataTask(with url : URL, completionHandler : @escaping @Sendable (Data?, URLResponse?, Error?)->()) -> URLSessionDataTask
 }
 
-class ExamDataService {
-    static let instance = ExamDataService()
+protocol ExamDataServiceInterface {
+    func getSchoolList(withUrl url : URL, completion :@escaping(_ schoolList : [School])->())
+}
+
+
+class ExamDataService : ExamDataServiceInterface {
     
     var session : SessionProtocol = URLSession.shared as SessionProtocol 
     
-    func getSchoolExamScore(withUrl url : URL, completion :@escaping(_ schoolList : [School])->()) {
+    func getSchoolList(withUrl url : URL, completion :@escaping(_ schoolList : [School])->()) {
         
         session.dataTask(with: url) { data, response, error in
             if error != nil {
@@ -24,11 +29,13 @@ class ExamDataService {
                 guard let data = data else { print("no data") ; return }
                 
                 let decoder = JSONDecoder()
+                
                 do {
                    let SchoolExamList =  try decoder.decode([School].self, from: data)
                     completion(SchoolExamList)
                     
                 } catch  {
+                    completion([School]())
                     print(error, "Couldn't be parsed correctly")
                 }
             }

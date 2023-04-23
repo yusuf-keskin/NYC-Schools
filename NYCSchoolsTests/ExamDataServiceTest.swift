@@ -15,9 +15,8 @@ class ExamDataServiceTest: XCTestCase {
 
     override func setUpWithError() throws {
         sut = ExamDataService()
-        mockUrlSession = MockUrlSession()
-        sut.session = mockUrlSession
-
+//      mockUrlSession = MockUrlSession()
+//      sut.session = mockUrlSession
     }
 
     override func tearDownWithError() throws {
@@ -26,7 +25,7 @@ class ExamDataServiceTest: XCTestCase {
 
     func testDownload_UsesExpectedHost () {
         let examUrl = EXAM_URL
-        sut.getSchoolExamScore(withUrl: examUrl!) { schoolList in
+        sut.getSchoolList(withUrl: examUrl!) { schoolList in
 
         }
         let urlComponents = URLComponents(url: examUrl!, resolvingAgainstBaseURL: true)
@@ -35,11 +34,28 @@ class ExamDataServiceTest: XCTestCase {
     
     func testDownload_UsesExpectedPath () {
         let examUrl = EXAM_URL
-        sut.getSchoolExamScore(withUrl: URL(string: "https://data.cityofnewyork.us/resource/f9bf-2cp4.json")!) { schoolList in
+        sut.getSchoolList(withUrl: URL(string: "https://data.cityofnewyork.us/resource/f9bf-2cp4.json")!) { schoolList in
 
         }
         let urlComponents = URLComponents(url: examUrl!, resolvingAgainstBaseURL: true)
         XCTAssertEqual(urlComponents?.path, "/resource/f9bf-2cp4.json")
+    }
+    
+    func testGetSchoolListWithExamScoresFromServer() {
+        
+        var schools = [School]()
+        let url = URL(string: "https://data.cityofnewyork.us/resource/f9bf-2cp4.json")!
+        
+        let expectation = XCTestExpectation(description: "Getting School List from server")
+        
+        sut.getSchoolList(withUrl: url) { schoolList in
+            schools = schoolList
+            expectation.fulfill()
+        }
+        
+        wait(for: [expectation], timeout: 5.0)
+        XCTAssert(!schools.isEmpty, "School array must be filled with data from api")
+        
     }
       
 }

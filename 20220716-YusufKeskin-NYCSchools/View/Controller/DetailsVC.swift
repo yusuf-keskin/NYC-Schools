@@ -9,9 +9,18 @@ import UIKit
 
 class DetailsVC: UIViewController {
     
-    var detailsModel = DetailsViewModel()
-    var dbn : String!
+    var detailsModel : DetailsViewModelInterface?
+    var dbn : String?
     
+    init(detailsModel: DetailsViewModelInterface, dbn: String!) {
+        self.detailsModel = detailsModel
+        self.dbn = dbn
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
     
     @IBOutlet weak var schoolNameLbl: UILabel!
     @IBOutlet weak var readingScoreLbl: UILabel!
@@ -33,8 +42,7 @@ class DetailsVC: UIViewController {
     override func viewDidLoad() {
         setupViewElements()
         
-        detailsModel.dbn.value = self.dbn!
-        detailsModel.getSchoolDetails { schoolDetail in
+        detailsModel?.getSchoolDetails { schoolDetail in
             print(schoolDetail)
             DispatchQueue.main.async { [self] in
                 
@@ -45,11 +53,9 @@ class DetailsVC: UIViewController {
                 self.schoolNameLbl.text = schoolDetail.school_name.uppercased()
                 
                 setupViewAfterDataLoaded()
+
             }
-            
         }
-        
-        
     }
     
     func setupViewAfterDataLoaded () {

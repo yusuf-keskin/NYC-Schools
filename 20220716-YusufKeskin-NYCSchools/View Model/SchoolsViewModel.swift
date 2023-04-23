@@ -5,11 +5,20 @@
 //  Created by YUSUF KESKİN on 1.08.2022.
 //
 
-class SchoolViewModel {
+protocol SchoolViewModelInterface {
+    func getExamData (completion: @escaping (_ schools : [School])-> ())
+}
 
+class SchoolViewModel: SchoolViewModelInterface {
     
-    func getExamData (completion: @escaping (_ schools : [School]?)-> ()) {
-        ExamDataService.instance.getSchoolExamScore(withUrl: EXAM_URL!) { schoolList in
+    let examDataService : ExamDataServiceInterface
+    
+    init(examDataService : ExamDataServiceInterface) {
+        self.examDataService = examDataService
+    }
+
+    func getExamData (completion: @escaping (_ schools : [School])-> ()) {
+        examDataService.getSchoolList(withUrl: EXAM_URL!) { schoolList in
             completion(schoolList)
         }
     }

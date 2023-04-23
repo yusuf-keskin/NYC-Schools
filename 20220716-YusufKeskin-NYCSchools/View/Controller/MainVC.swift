@@ -15,10 +15,7 @@ class MainVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         fadeViewInThenOut(view: splashLabel, delay: 0)
-        
-        
     }
     
     func fadeViewInThenOut(view : UIView, delay: TimeInterval) {
@@ -29,9 +26,13 @@ class MainVC: UIViewController {
         } completion: { success in
             let board = UIStoryboard(name: "Main", bundle: nil)
             let listVC = board.instantiateViewController(withIdentifier: "ListVC") as! ListVC
+            
+            let examDataService = ExamDataService()
+            let schoolViewModel = SchoolViewModel(examDataService: examDataService)
+            listVC.schoolViewModel = schoolViewModel
+            
             listVC.modalPresentationStyle = .fullScreen
             self.present(listVC, animated: true)
-            
         }
     }
 
